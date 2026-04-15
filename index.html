@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chrome City Chaos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="sky-glow"></div>
+
+  <div id="menu" class="overlay">
+    <div class="menu-card">
+      <p class="eyebrow">Open World 3D</p>
+      <h1>Chrome City Chaos</h1>
+      <p class="menu-copy">
+        Uma versão bem mais completa do mini GTA para navegador, com cidade procedural, prédios texturizados,
+        NPCs com rosto, gangues, polícia, minimapa, loja, pickups e missões em sequência.
+      </p>
+
+      <div class="feature-grid">
+        <article>
+          <span>🏙️</span>
+          <strong>Cidade viva</strong>
+          <p>Ruas, prédios variados, postes, árvores, carros de tráfego e clima dinâmico.</p>
+        </article>
+        <article>
+          <span>🎯</span>
+          <strong>Sistemas</strong>
+          <p>Tiro, dano, IA, wanted level, objetivos, recompensas e upgrades.</p>
+        </article>
+        <article>
+          <span>🧱</span>
+          <strong>Texturas visuais</strong>
+          <p>Fachadas, pedra, vidro, asfalto, placas e rostos feitos em imagem/canvas.</p>
+        </article>
+      </div>
+
+      <div class="controls-box">
+        <strong>Controles</strong>
+        <p>`WASD` andar, `Shift` correr, `Espaço` pular, mouse olhar, clique atirar, `B` loja, `M` mapa, `E` interação.</p>
+      </div>
+
+      <button id="startButton" class="primary-btn">Entrar na cidade</button>
+      <p class="tip">Melhor experiência no desktop. Em telas touch, os botões virtuais aparecem automaticamente.</p>
+    </div>
+  </div>
+
+  <div id="gameOver" class="overlay hidden">
+    <div class="menu-card compact">
+      <p class="eyebrow">Operação encerrada</p>
+      <h2>Você caiu</h2>
+      <p id="gameOverText" class="menu-copy">A cidade ainda está quente. Hora de tentar mais uma vez.</p>
+      <button id="restartButton" class="primary-btn">Reiniciar partida</button>
+    </div>
+  </div>
+
+  <div id="hud">
+    <section class="panel stats-panel">
+      <p class="panel-kicker">Status</p>
+      <div class="meter-row">
+        <span>Vida</span>
+        <div class="meter"><div id="healthFill" class="fill health-fill"></div></div>
+        <strong id="healthValue">100</strong>
+      </div>
+      <div class="meter-row">
+        <span>Colete</span>
+        <div class="meter"><div id="armorFill" class="fill armor-fill"></div></div>
+        <strong id="armorValue">35</strong>
+      </div>
+      <div class="meta-row">
+        <span>Dinheiro</span>
+        <strong id="moneyValue">$0</strong>
+      </div>
+      <div class="meta-row">
+        <span>Arma</span>
+        <strong id="weaponValue">Pulse Pistol</strong>
+      </div>
+      <div class="meta-row">
+        <span>Calor</span>
+        <strong id="wantedValue">☆☆☆☆☆</strong>
+      </div>
+    </section>
+
+    <section class="panel mission-panel">
+      <p class="panel-kicker">Missão Atual</p>
+      <h2 id="missionTitle">Entrar na cidade</h2>
+      <p id="missionObjective">Clique no botão para iniciar.</p>
+      <div class="meta-row">
+        <span>Distrito</span>
+        <strong id="districtValue">Centro</strong>
+      </div>
+      <div class="meta-row">
+        <span>Relógio</span>
+        <strong id="timeValue">06:00</strong>
+      </div>
+      <div class="meta-row">
+        <span>Inimigos ativos</span>
+        <strong id="threatValue">0</strong>
+      </div>
+    </section>
+  </div>
+
+  <div id="interactionPrompt" class="prompt hidden">Pressione E para interagir</div>
+
+  <div id="shopPanel" class="panel shop-panel hidden">
+    <div class="shop-header">
+      <div>
+        <p class="panel-kicker">Arsenal Neon</p>
+        <h3>Loja de upgrades</h3>
+      </div>
+      <button id="closeShop" class="close-btn" type="button">Fechar</button>
+    </div>
+    <p class="shop-copy">Compre melhorias enquanto estiver perto da banca azul.</p>
+    <div class="shop-grid">
+      <button class="shop-btn" data-item="weapon" type="button"></button>
+      <button class="shop-btn" data-item="armor" type="button"></button>
+      <button class="shop-btn" data-item="heal" type="button"></button>
+      <button class="shop-btn" data-item="speed" type="button"></button>
+      <button class="shop-btn" data-item="bribe" type="button"></button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <div id="crosshair" aria-hidden="true">
+    <span></span>
+    <span></span>
+  </div>
+
+  <canvas id="minimap" width="220" height="220"></canvas>
+
+  <div id="touchUi" class="touch-ui">
+    <div class="touch-pad">
+      <button data-touch="w" type="button">▲</button>
+      <div class="touch-pad-row">
+        <button data-touch="a" type="button">◀</button>
+        <button data-touch="s" type="button">▼</button>
+        <button data-touch="d" type="button">▶</button>
+      </div>
+    </div>
+
+    <div class="touch-actions">
+      <button data-touch="shoot" type="button">ATIRAR</button>
+      <button data-touch="jump" type="button">PULAR</button>
+      <button data-touch="sprint" type="button">CORRER</button>
+      <button data-touch="interact" type="button">AÇÃO</button>
+    </div>
+
+    <div id="lookPad" class="look-pad">Arraste para olhar</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
